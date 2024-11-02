@@ -1,19 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { FaWpforms } from "react-icons/fa";
 import { MdOutlineArrowCircleLeft } from "react-icons/md";
+import { fetchUserForms } from "../api/dashboard/getForms";
+import { Loader } from "./Loader";
 
-const Sidebar = () => {
+const Sidebar = ({ onSelectForm }) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [userforms, setUserForms] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [selectedFormId, setSelectedFormId] = useState(null); 
 
-  const menuItems = [
-    { title: "Transactions", icon: "Transactions" },
-    { title: "Loyalty Cards", icon: "Card", hasGap: true },
-    { title: "Subscriptions", icon: "Calendar" },
-    { title: "Debts", icon: "Debt" },
-    { title: "Legal Information", icon: "Legal" },
-    { title: "Notifications", icon: "Notifications", hasGap: true },
-    { title: "Settings", icon: "Settings" },
-  ];
+  const getUserFormsData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUserForms();
+      setUserForms(data?.content);
+    } catch (err) {
+      console.error("Failed to fetch user info:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    getUserFormsData();
+  }, [getUserFormsData]);
+
+  const handleSelectForm = (form) => {
+    if (selectedFormId === form.id) {
+      setSelectedFormId(null); 
+      onSelectForm(null); 
+    } else {
+      setSelectedFormId(form.id); 
+      onSelectForm(form); 
+    }
+  };
 
   return (
     <div className="flex">
@@ -22,7 +43,6 @@ const Sidebar = () => {
           isOpen ? "w-72" : "w-20"
         } bg-white h-full p-5 pt-8 duration-300 shadow-lg relative`}
       >
-        {/* Toggle Button */}
         <MdOutlineArrowCircleLeft
           className={`absolute cursor-pointer -right-5 top-9 ${
             !isOpen && "rotate-180"
@@ -32,7 +52,6 @@ const Sidebar = () => {
           size={37}
         />
 
-        {/* Sidebar Header */}
         <div className="flex gap-x-4 items-center mb-6">
           <h1
             className={`text-black font-medium text-xl transition-transform duration-200 ${
@@ -43,26 +62,30 @@ const Sidebar = () => {
           </h1>
         </div>
 
-        {/* Table List */}
-        <ul className="space-y-2">
-          {menuItems.map((menuItem, index) => (
-            <li
-              key={index}
-              className={`flex items-center p-2 text-light-gray rounded-md cursor-pointer hover:bg-main-purple hover:text-white text-sm gap-x-4 ${
-                menuItem.hasGap ? "mt-6" : ""
-              }`}
-            >
-              <FaWpforms size={22} />
-              <span
-                className={`origin-left transition-transform duration-200 ${
-                  !isOpen && "hidden"
-                }`}
+        {loading ? (
+          <Loader />
+        ) : (
+          <ul className="space-y-2">
+            {userforms?.map((form) => (
+              <li
+                key={form?.id}
+                className={`flex items-center p-2 text-light-gray rounded-md cursor-pointer 
+                ${selectedFormId === form.id ? "bg-main-purple text-white" : "hover:bg-main-purple hover:text-white"}
+                text-sm gap-x-4`}
+                onClick={() => handleSelectForm(form)}
               >
-                {menuItem.title}
-              </span>
-            </li>
-          ))}
-        </ul>
+                <FaWpforms size={22} />
+                <span
+                  className={`origin-left transition-transform duration-200 ${
+                    !isOpen && "hidden"
+                  }`}
+                >
+                  {form?.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
       </aside>
     </div>
   );

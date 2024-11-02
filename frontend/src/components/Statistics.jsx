@@ -3,14 +3,15 @@ import { IoCreateOutline } from "react-icons/io5";
 import { RiContractLine } from "react-icons/ri";
 import { BsCalendarCheck } from "react-icons/bs";
 import PropTypes from "prop-types";
+import Moment from 'moment';
 
 const StatCard = ({ icon, title, value }) => {
   const formattedValue =
-    typeof value === "number" ? value.toLocaleString("en-US") : value;
+    typeof value === "number" ? value.toLocaleString("en-US") : Moment(value).format('LL');
 
   return (
     <div className="flex items-center space-x-4 p-4">
-      <div className="flex justify-center items-center w-10 h-10 xl:w-20 xl:h-20 rounded-full bg-green-gradient text-lg xl:text-4xl">
+      <div className="flex justify-center items-center w-[42px] h-[42px] xl:w-[84px] xl:h-[84px] rounded-full bg-green-gradient text-lg xl:text-4xl">
         {icon}
       </div>
       <div>
@@ -27,25 +28,26 @@ StatCard.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 };
 
-const Statistics = () => {
+const Statistics = ({submissions, lastSubmission, created}) => {
+  
   return (
     <div className="flex lg:space-x-8 flex-col lg:flex-row justify-evenly bg-white p-4 xl:p-6 rounded-xl shadow-lg w-full">
       <StatCard
         icon={<RiContractLine className="text-green-500" />}
         title="Total Submissions"
-        value={5423}
+        value={parseInt(submissions)}
       />
       <div className="border-r border-[#F0F0F0]"></div>
       <StatCard
         icon={<BsCalendarCheck className="text-green-500" />}
         title="Last Submission At"
-        value={1893}
+        value={lastSubmission}
       />
       <div className="border-r border-[#F0F0F0]"></div>
       <StatCard
         icon={<IoCreateOutline className="text-green-500" />}
         title="Form Created At"
-        value={189}
+        value={created}
       />
     </div>
   );
