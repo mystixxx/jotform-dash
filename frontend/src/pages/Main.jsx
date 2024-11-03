@@ -27,7 +27,7 @@ const formSubmissionsData = {
 const Main = ({ selectedForm }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [userforminfo, setUserFormsInfo] = useState(null);
-  const [formQuestions, setFormQuestions] = useState([]); 
+  const [formQuestions, setFormQuestions] = useState([]);
   const limit = 8;
 
   const getFormsInfoData = useCallback(async () => {
@@ -59,7 +59,7 @@ const Main = ({ selectedForm }) => {
     ? formSubmissionsData[selectedForm.title]?.length || 0
     : 0;
 
-    console.log(formQuestions)
+  console.log(formQuestions);
 
   const totalPages = Math.ceil(totalSubmissions / limit);
 
@@ -77,7 +77,9 @@ const Main = ({ selectedForm }) => {
         <>
           <Statistics
             submissions={userforminfo?.content?.count}
-            lastSubmission={userforminfo?.content?.last_submission || "None Yet"}
+            lastSubmission={
+              userforminfo?.content?.last_submission || "None Yet"
+            }
             created={userforminfo?.content?.created_at}
           />
           {/* <Table

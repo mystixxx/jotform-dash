@@ -25,7 +25,7 @@ const StatCard = ({ icon, title, value }) => {
 StatCard.propTypes = {
   icon: PropTypes.node.isRequired,
   title: PropTypes.string.isRequired,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 const Statistics = ({submissions, lastSubmission, created}) => {
