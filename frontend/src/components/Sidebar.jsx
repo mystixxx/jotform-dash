@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { FaWpforms } from "react-icons/fa";
+import { FaWpforms, FaEllipsisV } from "react-icons/fa";
 import { MdOutlineArrowCircleLeft } from "react-icons/md";
 import { fetchUserForms } from "../api/dashboard/getForms";
 import { Loader } from "./Loader";
@@ -9,6 +9,7 @@ const Sidebar = ({ onSelectForm }) => {
   const [userforms, setUserForms] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedFormId, setSelectedFormId] = useState(null); 
+  const [showMenu, setShowMenu] = useState(null); // Track which form's menu is open
 
   const getUserFormsData = useCallback(async () => {
     setLoading(true);
@@ -34,6 +35,15 @@ const Sidebar = ({ onSelectForm }) => {
       setSelectedFormId(form.id); 
       onSelectForm(form); 
     }
+  };
+
+  const handleMenuClick = (formId) => {
+    setShowMenu(showMenu === formId ? null : formId);
+  };
+
+  const handleNavigateToForm = (formUrl) => {
+    window.open(formUrl, "_blank"); 
+    setShowMenu(null); 
   };
 
   const enabledUserForms = userforms?.filter(form => form.status === "ENABLED");
@@ -69,7 +79,7 @@ const Sidebar = ({ onSelectForm }) => {
                 key={form.id}
                 className={`flex items-center p-2 text-light-gray rounded-md cursor-pointer 
                 ${selectedFormId === form.id ? "bg-main-purple text-white" : "hover:bg-main-purple hover:text-white"}
-                text-sm gap-x-4`}
+                text-sm gap-x-4 relative`}
                 onClick={() => handleSelectForm(form)}
               >
                 <FaWpforms size={22} />
@@ -78,6 +88,27 @@ const Sidebar = ({ onSelectForm }) => {
                 >
                   {form.title}
                 </span>
+
+                {/* Three-dot menu */}
+                <FaEllipsisV
+                  className="ml-auto cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMenuClick(form.id);
+                  }}
+                />
+
+                {/* Popup Menu */}
+                {showMenu === form.id && (
+                  <div className="absolute top-full right-0 mt-1 w-32 bg-white shadow-lg border rounded-md">
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-black"
+                      onClick={() => handleNavigateToForm(form?.url)}
+                    >
+                      Go to Form
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
