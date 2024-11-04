@@ -1,4 +1,4 @@
-import axios from '../axios';
+import { jotformApi } from '../axios'; 
 import { urlConfig } from '../config';
 
 export const fetchFormInfo = (formID, _params = {}) => {
@@ -10,5 +10,5 @@ export const fetchFormInfo = (formID, _params = {}) => {
     },
   };
 
-  return axios.request(config);
+  return jotformApi.request(config);
 };

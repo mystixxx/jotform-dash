@@ -1,7 +1,11 @@
 import axios from 'axios';
-import { apiEndpoints } from './config';
+import { apiEndpoints, apiDatabase } from './config';
 
-const getApiBaseUrl = async () => {
+const getApiBaseUrl = async (isDatabaseCall = false) => {
+  if (isDatabaseCall) {
+    return apiDatabase; 
+  }
+
   try {
     const response = await axios.get('https://ipapi.co/json/');
     const { country_code } = response.data;
@@ -18,23 +22,21 @@ const getApiBaseUrl = async () => {
   }
 };
 
-const createAxiosInstance = async () => {
-  const baseURL = await getApiBaseUrl();
+const createAxiosInstance = async (isDatabaseCall = false) => {
+  const baseURL = await getApiBaseUrl(isDatabaseCall);
   
   const instance = axios.create({
     baseURL,
   });
 
   instance.interceptors.request.use(
-    async (config) => {
+    (config) => {
       const apiKey = process.env.REACT_APP_JOTFORM_API_KEY;
-      if (apiKey) {
+      if (apiKey && !isDatabaseCall) { // Check if not a database call
         config.params = {
           ...config.params,
           apiKey,
         };
-      } else {
-        console.warn("API key is missing");
       }
       return config;
     },
@@ -49,6 +51,7 @@ const createAxiosInstance = async () => {
   return instance;
 };
 
-// Usage example
-const api = await createAxiosInstance();
-export default api;
+const jotformApi = await createAxiosInstance(); // For Jotform API
+const databaseApi = await createAxiosInstance(true); // For database calls
+
+export { jotformApi, databaseApi };
