@@ -58,7 +58,7 @@ app.post("/submit-answers/:formName", async (req, res) => {
   const selectQuery = `
     SELECT COUNT(*) AS count
     FROM ${formName}
-    WHERE ${columns.map((col, index) => `${col} = $${index + 1}`).join(" AND ")}
+    WHERE ${columns.map((col, index) => `${col.toLocaleLowerCase()} = $${index + 1}`).join(" AND ")}
   `;
 
   try {
